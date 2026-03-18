@@ -16,6 +16,7 @@ Available Commands:
   lint        Run linters
   run         Run the project
   setup       Install dependencies and bootstrap the environment
+  sync        Sync dependencies with the manifest or lockfile
   test        Run tests
   version     Print the dev version
 

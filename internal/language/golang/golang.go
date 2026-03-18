@@ -26,6 +26,7 @@ func (g *Go) DefaultTasks() map[string]config.Task {
 		"fmt":   {Cmd: "gofmt -w ."},
 		"clean": {Cmd: "go clean ./..."},
 		"setup": {Cmd: "go mod download"},
+		"sync":  {Cmd: "go mod tidy"},
 		"ci":    {Deps: []string{"lint", "test", "build"}},
 	}
 }
@@ -60,4 +61,8 @@ func (g *Go) Clean(ctx context.Context, ex executor.Executor) error {
 
 func (g *Go) Setup(ctx context.Context, ex executor.Executor) error {
 	return ex.Run(ctx, "go mod download", nil)
+}
+
+func (g *Go) Sync(ctx context.Context, ex executor.Executor) error {
+	return ex.Run(ctx, "go mod tidy", nil)
 }

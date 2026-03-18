@@ -26,6 +26,7 @@ func (p *Python) DefaultTasks() map[string]config.Task {
 		"fmt":   {Cmd: "ruff format ."},
 		"clean": {Cmd: "find . -type d -name __pycache__ -exec rm -rf {} +"},
 		"setup": {Cmd: "pip install -e .[dev]"},
+		"sync":  {Cmd: "uv sync"},
 		"ci":    {Deps: []string{"lint", "test", "build"}},
 	}
 }
@@ -60,4 +61,8 @@ func (p *Python) Clean(ctx context.Context, ex executor.Executor) error {
 
 func (p *Python) Setup(ctx context.Context, ex executor.Executor) error {
 	return ex.Run(ctx, "pip install -e .[dev]", nil)
+}
+
+func (p *Python) Sync(ctx context.Context, ex executor.Executor) error {
+	return ex.Run(ctx, "uv sync", nil)
 }
