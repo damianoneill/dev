@@ -87,14 +87,6 @@ func newOutput() *output.Writer {
 	return output.New(flagVerbose)
 }
 
-// newExecutor creates an Executor from the current flag state.
-func newExecutor(out *output.Writer, dir string) executor.Executor {
-	if flagDryRun {
-		return executor.NewDryRun(out)
-	}
-	return executor.New(out, dir)
-}
-
 // Execute is the entry point called from main.
 func Execute() {
 	if err := rootCmd.ExecuteContext(context.Background()); err != nil {

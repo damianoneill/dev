@@ -2,12 +2,10 @@ package golang
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/damianoneill/dev/internal/config"
 	"github.com/damianoneill/dev/internal/executor"
 	"github.com/damianoneill/dev/internal/language"
-	"github.com/damianoneill/dev/internal/scaffold"
 )
 
 func init() {
@@ -22,10 +20,13 @@ func (g *Go) Name() string { return "go" }
 func (g *Go) DefaultTasks() map[string]config.Task {
 	return map[string]config.Task{
 		"build": {Cmd: "go build ./..."},
+		"run":   {Cmd: "go run ."},
 		"test":  {Cmd: "go test ./..."},
 		"lint":  {Cmd: "golangci-lint run"},
 		"fmt":   {Cmd: "gofmt -w ."},
 		"clean": {Cmd: "go clean ./..."},
+		"setup": {Cmd: "go mod download"},
+		"ci":    {Deps: []string{"lint", "test", "build"}},
 	}
 }
 
@@ -59,14 +60,4 @@ func (g *Go) Clean(ctx context.Context, ex executor.Executor) error {
 
 func (g *Go) Setup(ctx context.Context, ex executor.Executor) error {
 	return ex.Run(ctx, "go mod download", nil)
-}
-
-func (g *Go) Init(ctx context.Context, ex executor.Executor, dir string, p scaffold.Params) error {
-	if err := ex.Run(ctx, "go mod init "+p.Module, nil); err != nil {
-		return err
-	}
-	if err := scaffold.WriteFile(filepath.Join(dir, "main.go"), scaffold.GoMainTmpl, p); err != nil {
-		return err
-	}
-	return scaffold.WriteFile(filepath.Join(dir, ".golangci.yml"), scaffold.GolangciTmpl, p)
 }

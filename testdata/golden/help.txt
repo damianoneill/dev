@@ -12,7 +12,7 @@ Available Commands:
   doctor      Validate the development environment
   fmt         Format source code
   help        Help about any command
-  init        Initialise a project in the current directory
+  init        Write a dev.yaml for the current project
   lint        Run linters
   run         Run the project
   setup       Install dependencies and bootstrap the environment
