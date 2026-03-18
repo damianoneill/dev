@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/damianoneill/dev/internal/language"
-	"github.com/damianoneill/dev/internal/task"
 )
 
 var buildCmd = &cobra.Command{
@@ -12,8 +11,8 @@ var buildCmd = &cobra.Command{
 	Short: "Build the project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ac := appCtx(cmd)
-		if t, ok := ac.Config.Project.Tasks["build"]; ok && t.Cmd != "" {
-			return task.New(ac.Config.Project.Tasks, ac.Executor).Run(cmd.Context(), "build")
+		if taskDefined(ac.Config.Project.Tasks, "build") {
+			return runTask(cmd.Context(), "build", ac.Config.Project.Tasks, ac.Executor)
 		}
 		lang, err := language.Resolve(ac.Config.Project.Language)
 		if err != nil {

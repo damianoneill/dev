@@ -64,4 +64,6 @@ func init() {
 	register(&binaryCheck{"golangci-lint", "golangci-lint", "go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"})
 	register(&binaryCheck{"python", "python3", "https://www.python.org/downloads/"})
 	register(&binaryCheck{"git", "git", "https://git-scm.com/downloads"})
+	register(&binaryCheck{"trivy", "trivy", "https://aquasecurity.github.io/trivy/latest/getting-started/installation/"})
+	register(&binaryCheck{"opengrep", "opengrep", "https://github.com/opengrep/opengrep"})
 }

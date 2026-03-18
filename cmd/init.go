@@ -13,7 +13,7 @@ import (
 )
 
 // taskOrder defines the order tasks appear in the generated dev.yaml.
-var taskOrder = []string{"build", "run", "test", "lint", "fmt", "clean", "setup", "sync", "ci"}
+var taskOrder = []string{"build", "run", "test", "lint", "fmt", "clean", "setup", "sync", "trivy", "opengrep", "scan", "ci"}
 
 var initCmd = &cobra.Command{
 	Use:   "init <language>",

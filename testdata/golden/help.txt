@@ -15,6 +15,7 @@ Available Commands:
   init        Write a dev.yaml for the current project
   lint        Run linters
   run         Run the project
+  scan        Run security scans (trivy + opengrep)
   setup       Install dependencies and bootstrap the environment
   sync        Sync dependencies with the manifest or lockfile
   test        Run tests

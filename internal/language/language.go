@@ -20,6 +20,7 @@ type Language interface {
 	Clean(ctx context.Context, ex executor.Executor) error
 	Setup(ctx context.Context, ex executor.Executor) error
 	Sync(ctx context.Context, ex executor.Executor) error
+	Scan(ctx context.Context, ex executor.Executor) error
 }
 
 var registry = map[string]Language{}

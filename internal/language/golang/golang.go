@@ -19,15 +19,18 @@ func (g *Go) Name() string { return "go" }
 
 func (g *Go) DefaultTasks() map[string]config.Task {
 	return map[string]config.Task{
-		"build": {Cmd: "go build ./..."},
-		"run":   {Cmd: "go run ."},
-		"test":  {Cmd: "go test ./..."},
-		"lint":  {Cmd: "golangci-lint run"},
-		"fmt":   {Cmd: "gofmt -w ."},
-		"clean": {Cmd: "go clean ./..."},
-		"setup": {Cmd: "go mod download"},
-		"sync":  {Cmd: "go mod tidy"},
-		"ci":    {Deps: []string{"lint", "test", "build"}},
+		"build":    {Cmd: "go build ./..."},
+		"run":      {Cmd: "go run ."},
+		"test":     {Cmd: "go test ./..."},
+		"lint":     {Cmd: "golangci-lint run"},
+		"fmt":      {Cmd: "gofmt -w ."},
+		"clean":    {Cmd: "go clean ./..."},
+		"setup":    {Cmd: "go mod download"},
+		"sync":     {Cmd: "go mod tidy"},
+		"trivy":    {Cmd: "trivy fs ."},
+		"opengrep": {Cmd: "opengrep scan ."},
+		"scan":     {Deps: []string{"trivy", "opengrep"}},
+		"ci":       {Deps: []string{"lint", "test", "build"}},
 	}
 }
 
@@ -65,4 +68,11 @@ func (g *Go) Setup(ctx context.Context, ex executor.Executor) error {
 
 func (g *Go) Sync(ctx context.Context, ex executor.Executor) error {
 	return ex.Run(ctx, "go mod tidy", nil)
+}
+
+func (g *Go) Scan(ctx context.Context, ex executor.Executor) error {
+	if err := ex.Run(ctx, "trivy fs .", nil); err != nil {
+		return err
+	}
+	return ex.Run(ctx, "opengrep scan .", nil)
 }
