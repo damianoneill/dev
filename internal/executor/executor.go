@@ -26,15 +26,23 @@ func New(out *output.Writer, dir string) *Real {
 	return &Real{out: out, dir: dir}
 }
 
+// shellOperators are characters that require sh -c to interpret correctly.
+const shellOperators = "&|;<>"
+
 func (r *Real) Run(ctx context.Context, cmd string, env map[string]string) error {
 	r.out.Command(cmd)
 
-	parts := strings.Fields(cmd)
-	if len(parts) == 0 {
-		return fmt.Errorf("empty command")
+	var c *exec.Cmd
+	if strings.ContainsAny(cmd, shellOperators) {
+		c = exec.CommandContext(ctx, "sh", "-c", cmd)
+	} else {
+		parts := strings.Fields(cmd)
+		if len(parts) == 0 {
+			return fmt.Errorf("empty command")
+		}
+		c = exec.CommandContext(ctx, parts[0], parts[1:]...)
 	}
 
-	c := exec.CommandContext(ctx, parts[0], parts[1:]...)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	c.Dir = r.dir
