@@ -71,8 +71,11 @@ func writeTemplate(path, tmpl string, p Params) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	return t.Execute(f, p)
+	if err := t.Execute(f, p); err != nil {
+		_ = f.Close()
+		return err
+	}
+	return f.Close()
 }
 
 // gitRemoteModule tries to derive a module path from the git remote URL.
