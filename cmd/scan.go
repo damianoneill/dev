@@ -8,7 +8,7 @@ import (
 
 var scanCmd = &cobra.Command{
 	Use:   "scan",
-	Short: "Run security scans (trivy + opengrep)",
+	Short: "Run security scans",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ac := appCtx(cmd)
 		if taskDefined(ac.Config.Project.Tasks, "scan") {
