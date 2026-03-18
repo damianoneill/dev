@@ -2,10 +2,12 @@ package python
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/damianoneill/dev/internal/config"
 	"github.com/damianoneill/dev/internal/executor"
 	"github.com/damianoneill/dev/internal/language"
+	"github.com/damianoneill/dev/internal/scaffold"
 )
 
 func init() {
@@ -57,4 +59,8 @@ func (p *Python) Clean(ctx context.Context, ex executor.Executor) error {
 
 func (p *Python) Setup(ctx context.Context, ex executor.Executor) error {
 	return ex.Run(ctx, "pip install -e .[dev]", nil)
+}
+
+func (p *Python) Init(ctx context.Context, ex executor.Executor, dir string, params scaffold.Params) error {
+	return scaffold.WriteFile(filepath.Join(dir, "pyproject.toml"), scaffold.PyprojectTmpl, params)
 }

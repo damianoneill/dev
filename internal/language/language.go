@@ -6,6 +6,7 @@ import (
 
 	"github.com/damianoneill/dev/internal/config"
 	"github.com/damianoneill/dev/internal/executor"
+	"github.com/damianoneill/dev/internal/scaffold"
 )
 
 // Language defines the contract each language implementation must satisfy.
@@ -19,6 +20,8 @@ type Language interface {
 	Fmt(ctx context.Context, ex executor.Executor) error
 	Clean(ctx context.Context, ex executor.Executor) error
 	Setup(ctx context.Context, ex executor.Executor) error
+	// Init scaffolds language-specific files into dir for `dev init`.
+	Init(ctx context.Context, ex executor.Executor, dir string, p scaffold.Params) error
 }
 
 var registry = map[string]Language{}

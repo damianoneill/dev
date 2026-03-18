@@ -2,10 +2,12 @@ package golang
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/damianoneill/dev/internal/config"
 	"github.com/damianoneill/dev/internal/executor"
 	"github.com/damianoneill/dev/internal/language"
+	"github.com/damianoneill/dev/internal/scaffold"
 )
 
 func init() {
@@ -57,4 +59,14 @@ func (g *Go) Clean(ctx context.Context, ex executor.Executor) error {
 
 func (g *Go) Setup(ctx context.Context, ex executor.Executor) error {
 	return ex.Run(ctx, "go mod download", nil)
+}
+
+func (g *Go) Init(ctx context.Context, ex executor.Executor, dir string, p scaffold.Params) error {
+	if err := ex.Run(ctx, "go mod init "+p.Module, nil); err != nil {
+		return err
+	}
+	if err := scaffold.WriteFile(filepath.Join(dir, "main.go"), scaffold.GoMainTmpl, p); err != nil {
+		return err
+	}
+	return scaffold.WriteFile(filepath.Join(dir, ".golangci.yml"), scaffold.GolangciTmpl, p)
 }
