@@ -27,7 +27,9 @@ func (p *Python) DefaultTasks() map[string]config.Task {
 		"clean":    {Cmd: "find . -type d -name __pycache__ -exec rm -rf {} +"},
 		"setup":    {Cmd: "pip install -e .[dev]"},
 		"sync":     {Cmd: "uv sync"},
-		"scan": {Cmd: "trivy fs . && opengrep scan ."},
+		"trivy":    {Cmd: "trivy fs ."},
+		"opengrep": {Cmd: "opengrep scan ."},
+		"scan":     {Deps: []string{"trivy", "opengrep"}},
 		"ci":       {Deps: []string{"lint", "test", "build"}},
 	}
 }

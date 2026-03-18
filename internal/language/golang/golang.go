@@ -27,7 +27,9 @@ func (g *Go) DefaultTasks() map[string]config.Task {
 		"clean":    {Cmd: "go clean ./..."},
 		"setup":    {Cmd: "go mod download"},
 		"sync":     {Cmd: "go mod tidy"},
-		"scan": {Cmd: "trivy fs . && opengrep scan ."},
+		"trivy":    {Cmd: "trivy fs ."},
+		"opengrep": {Cmd: "opengrep scan ."},
+		"scan":     {Deps: []string{"trivy", "opengrep"}},
 		"ci":       {Deps: []string{"lint", "test", "build"}},
 	}
 }

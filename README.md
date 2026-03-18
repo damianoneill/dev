@@ -15,16 +15,19 @@ Or download a binary from the [releases page](https://github.com/damianoneill/de
 ## Usage
 
 ```bash
-dev build       # build the project
-dev test        # run tests
-dev lint        # run linters
-dev fmt         # format source code
-dev clean       # remove build artifacts
-dev run         # run the project
-dev ci          # lint → test → build pipeline
-dev setup       # install dependencies
-dev doctor      # validate the environment
-dev version     # print version
+dev init <language>  # generate dev.yaml with all defaults
+dev build            # build the project
+dev test             # run tests
+dev lint             # run linters
+dev fmt              # format source code
+dev clean            # remove build artifacts
+dev run              # run the project
+dev sync             # sync dependencies (go mod tidy / uv sync)
+dev scan             # run security scans
+dev ci               # lint → test → build pipeline
+dev setup            # install dependencies
+dev doctor           # validate the environment
+dev version          # print version
 ```
 
 All commands support:
@@ -37,27 +40,78 @@ All commands support:
 
 ## Configuration
 
-Add a `dev.yaml` to your project root to customise commands or define tasks:
+Run `dev init <language>` to generate a `dev.yaml` pre-populated with all defaults:
+
+```bash
+cd my-project
+dev init go
+```
+
+This writes a `dev.yaml` you can tune:
 
 ```yaml
-language: go   # optional — detected from go.mod / pyproject.toml
+language: go
 
 tasks:
   build:
-    cmd: go build -o bin/app ./cmd/app
+    cmd: go build ./...
   test:
     cmd: go test -race ./...
+  lint:
+    cmd: golangci-lint run
   ci:
     deps: [lint, test, build]
 ```
 
-If no `dev.yaml` is present, language is auto-detected and sensible defaults apply.
+If no `dev.yaml` is present, language is auto-detected from `go.mod` / `pyproject.toml` and built-in defaults apply.
 
 ### Override model
 
 1. Built-in defaults per language
 2. Project `dev.yaml` overrides defaults
 3. CLI flags override everything
+
+### Composing tools with deps
+
+Use `deps` to compose multiple tools under a single command. Sub-tasks are named entries in `dev.yaml` — they are **not** top-level `dev` commands, only reachable through the task runner.
+
+```yaml
+tasks:
+  ruff:
+    cmd: ruff check .
+  pre-commit:
+    cmd: pre-commit run --all-files
+  lint:
+    deps: [ruff, pre-commit]
+```
+
+```yaml
+tasks:
+  trivy:
+    cmd: trivy fs .
+  opengrep:
+    cmd: opengrep scan .
+  scan:
+    deps: [trivy, opengrep]
+```
+
+Remove a tool from `deps` or change its `cmd` without touching anything else.
+
+### pre-commit
+
+`pre-commit` integrates naturally through the task model. Add it to `setup` so hooks are installed on bootstrap, and to `lint` as a composed dep:
+
+```yaml
+tasks:
+  setup:
+    cmd: pre-commit install
+  pre-commit:
+    cmd: pre-commit run --all-files
+  lint:
+    deps: [golangci-lint, pre-commit]
+  golangci-lint:
+    cmd: golangci-lint run
+```
 
 ### Global defaults
 
@@ -70,10 +124,10 @@ defaults:
 
 ## Language support
 
-| Language | Detection    | Build          | Test    | Lint          | Fmt            |
-|----------|--------------|----------------|---------|---------------|----------------|
-| Go       | `go.mod`     | `go build ./…` | `go test ./…` | `golangci-lint run` | `gofmt -w .` |
-| Python   | `pyproject.toml` / `setup.py` | `python -m build` | `pytest` | `ruff check .` | `ruff format .` |
+| Language | Detection | Build | Test | Lint | Fmt | Sync |
+|---|---|---|---|---|---|---|
+| Go | `go.mod` | `go build ./...` | `go test ./...` | `golangci-lint run` | `gofmt -w .` | `go mod tidy` |
+| Python | `pyproject.toml` / `setup.py` | `python -m build` | `pytest` | `ruff check .` | `ruff format .` | `uv sync` |
 
 Adding a new language requires implementing a small interface and registering it — no plugin system needed.
 
