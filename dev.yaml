@@ -1,0 +1,15 @@
+language: go
+
+tasks:
+  build:
+    cmd: go build ./...
+  test:
+    cmd: go test ./...
+  lint:
+    cmd: golangci-lint run
+  fmt:
+    cmd: gofmt -w .
+  clean:
+    cmd: go clean ./...
+  ci:
+    deps: [lint, test, build]

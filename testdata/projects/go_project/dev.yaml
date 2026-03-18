@@ -1,0 +1,11 @@
+language: go
+
+tasks:
+  build:
+    cmd: go build ./...
+  test:
+    cmd: go test ./...
+  lint:
+    cmd: golangci-lint run
+  ci:
+    deps: [lint, test, build]

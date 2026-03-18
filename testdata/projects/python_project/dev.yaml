@@ -1,0 +1,11 @@
+language: python
+
+tasks:
+  build:
+    cmd: python -m build
+  test:
+    cmd: pytest
+  lint:
+    cmd: ruff check .
+  ci:
+    deps: [lint, test, build]

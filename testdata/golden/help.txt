@@ -1,0 +1,27 @@
+dev provides a unified command interface for build, test, lint, fmt,
+and more — regardless of language or project structure.
+
+Usage:
+  dev [command]
+
+Available Commands:
+  build       Build the project
+  ci          Run the full CI pipeline locally (lint → test → build)
+  clean       Remove build artifacts
+  completion  Generate the autocompletion script for the specified shell
+  doctor      Validate the development environment
+  fmt         Format source code
+  help        Help about any command
+  lint        Run linters
+  run         Run the project
+  setup       Install dependencies and bootstrap the environment
+  test        Run tests
+  version     Print the dev version
+
+Flags:
+      --cwd string   working directory (default: current directory)
+      --dry-run      print commands without executing
+  -h, --help         help for dev
+  -v, --verbose      verbose output
+
+Use "dev [command] --help" for more information about a command.
