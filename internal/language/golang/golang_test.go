@@ -39,6 +39,7 @@ func TestGo_DefaultTasks(t *testing.T) {
 	assert.Equal(t, "go clean ./...", tasks["clean"].Cmd)
 	assert.Equal(t, "go mod download", tasks["setup"].Cmd)
 	assert.Equal(t, "go mod tidy", tasks["sync"].Cmd)
+	assert.Equal(t, "go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out", tasks["coverage"].Cmd)
 	assert.Equal(t, []string{"trivy", "opengrep"}, tasks["scan"].Deps)
 	assert.Equal(t, []string{"lint", "test", "build"}, tasks["ci"].Deps)
 }
@@ -56,6 +57,7 @@ func TestGo_Methods_DryRun(t *testing.T) {
 	require.NoError(t, lang.Setup(ctx, ex))
 	require.NoError(t, lang.Sync(ctx, ex))
 	require.NoError(t, lang.Scan(ctx, ex))
+	require.NoError(t, lang.Coverage(ctx, ex, 75.0))
 	require.NoError(t, lang.Run(ctx, ex, nil))
 	require.NoError(t, lang.Run(ctx, ex, []string{"./cmd/dev"}))
 }

@@ -2,6 +2,7 @@ package python
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/damianoneill/dev/internal/config"
 	"github.com/damianoneill/dev/internal/executor"
@@ -30,6 +31,7 @@ func (p *Python) DefaultTasks() map[string]config.Task {
 		"trivy":    {Cmd: "trivy fs ."},
 		"opengrep": {Cmd: "opengrep scan ."},
 		"scan":     {Deps: []string{"trivy", "opengrep"}},
+		"coverage": {Cmd: "pytest --cov --cov-fail-under=75"},
 		"ci":       {Deps: []string{"lint", "test", "build"}},
 	}
 }
@@ -75,4 +77,8 @@ func (p *Python) Scan(ctx context.Context, ex executor.Executor) error {
 		return err
 	}
 	return ex.Run(ctx, "opengrep scan .", nil)
+}
+
+func (p *Python) Coverage(ctx context.Context, ex executor.Executor, minCoverage float64) error {
+	return ex.Run(ctx, fmt.Sprintf("pytest --cov --cov-fail-under=%.1f", minCoverage), nil)
 }

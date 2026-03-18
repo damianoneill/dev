@@ -2,6 +2,11 @@ package golang
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 
 	"github.com/damianoneill/dev/internal/config"
 	"github.com/damianoneill/dev/internal/executor"
@@ -30,6 +35,7 @@ func (g *Go) DefaultTasks() map[string]config.Task {
 		"trivy":    {Cmd: "trivy fs ."},
 		"opengrep": {Cmd: "opengrep scan ."},
 		"scan":     {Deps: []string{"trivy", "opengrep"}},
+		"coverage": {Cmd: "go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out"},
 		"ci":       {Deps: []string{"lint", "test", "build"}},
 	}
 }
@@ -75,4 +81,41 @@ func (g *Go) Scan(ctx context.Context, ex executor.Executor) error {
 		return err
 	}
 	return ex.Run(ctx, "opengrep scan .", nil)
+}
+
+func (g *Go) Coverage(ctx context.Context, ex executor.Executor, minCoverage float64) error {
+	if err := ex.Run(ctx, "go test -coverprofile=coverage.out ./...", nil); err != nil {
+		return err
+	}
+	// coverage.out won't exist in dry-run mode; skip threshold check.
+	if _, err := os.Stat("coverage.out"); os.IsNotExist(err) {
+		return nil
+	}
+	pct, err := goCoverageTotal(ctx, "coverage.out")
+	if err != nil {
+		return err
+	}
+	if pct < minCoverage {
+		return fmt.Errorf("coverage %.1f%% is below minimum %.1f%%", pct, minCoverage)
+	}
+	return nil
+}
+
+// goCoverageTotal runs "go tool cover -func" and returns the total coverage percentage.
+func goCoverageTotal(ctx context.Context, profile string) (float64, error) {
+	out, err := exec.CommandContext(ctx, "go", "tool", "cover", "-func="+profile).Output()
+	if err != nil {
+		return 0, fmt.Errorf("go tool cover: %w", err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	if len(lines) == 0 {
+		return 0, fmt.Errorf("go tool cover produced no output")
+	}
+	// Last line: "total:    (statements)    73.9%"
+	fields := strings.Fields(lines[len(lines)-1])
+	if len(fields) < 3 {
+		return 0, fmt.Errorf("unexpected go tool cover output: %s", lines[len(lines)-1])
+	}
+	pctStr := strings.TrimSuffix(fields[len(fields)-1], "%")
+	return strconv.ParseFloat(pctStr, 64)
 }

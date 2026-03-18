@@ -9,6 +9,7 @@ Available Commands:
   ci          Run the full CI pipeline locally (lint → test → build)
   clean       Remove build artifacts
   completion  Generate the autocompletion script for the specified shell
+  coverage    Run tests with coverage report
   doctor      Validate the development environment
   fmt         Format source code
   help        Help about any command

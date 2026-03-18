@@ -37,6 +37,7 @@ func TestPython_DefaultTasks(t *testing.T) {
 	assert.Equal(t, "ruff check .", tasks["lint"].Cmd)
 	assert.Equal(t, "ruff format .", tasks["fmt"].Cmd)
 	assert.Equal(t, "uv sync", tasks["sync"].Cmd)
+	assert.Equal(t, "pytest --cov --cov-fail-under=75", tasks["coverage"].Cmd)
 	assert.Equal(t, []string{"trivy", "opengrep"}, tasks["scan"].Deps)
 	assert.Equal(t, []string{"lint", "test", "build"}, tasks["ci"].Deps)
 }
@@ -54,6 +55,7 @@ func TestPython_Methods_DryRun(t *testing.T) {
 	require.NoError(t, lang.Setup(ctx, ex))
 	require.NoError(t, lang.Sync(ctx, ex))
 	require.NoError(t, lang.Scan(ctx, ex))
+	require.NoError(t, lang.Coverage(ctx, ex, 75.0))
 	require.NoError(t, lang.Run(ctx, ex, nil))
 	require.NoError(t, lang.Run(ctx, ex, []string{"myapp"}))
 }

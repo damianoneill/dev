@@ -21,6 +21,7 @@ type Language interface {
 	Setup(ctx context.Context, ex executor.Executor) error
 	Sync(ctx context.Context, ex executor.Executor) error
 	Scan(ctx context.Context, ex executor.Executor) error
+	Coverage(ctx context.Context, ex executor.Executor, minCoverage float64) error
 }
 
 var registry = map[string]Language{}
